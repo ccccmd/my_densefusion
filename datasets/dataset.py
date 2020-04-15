@@ -208,7 +208,7 @@ class PoseDataset(Dataset):
         img_masked: 通过box剪切下来的RGB图像
         target: 根据model_points点云信息，以及旋转偏移矩阵转换过的点云信息
         model_points: 目标初始帧(模型)对应的点云信息
-        # self.objlist.index(obj): 目标物体的序列编号
+        self.objlist.index(obj): 目标物体的序列编号
         '''
 
         return torch.from_numpy(cloud.astype(np.float32)), \
