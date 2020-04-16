@@ -40,10 +40,27 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
     base = base.contiguous().transpose(2, 1).contiguous()               # 转换维度[500, 3, 3]
     # [500, 500, 3]     每个点云需要与所有的predicted点云做距离差
     model_points = model_points.view(bs, 1, num_point_mesh, 3).repeat(1, num_p, 1, 1).view(bs * num_p, num_point_mesh, 3)
-    # [500, 500, 5]     每个点云需要与所有的predicted点云做距离差
+    # [500, 500, 3]     每个点云需要与所有的predicted点云做距离差
     target = target.view(bs, 1, num_point_mesh, 3).repeat(1, num_p, 1, 1).view(bs * num_p, num_point_mesh, 3)
     ori_target = target                                                 # 记录初始的目标点云
     pred_t = pred_t.contiguous().view(bs * num_p, 1, 3)
     ori_t = pred_t                                                      # 记录原始预测的偏移矩阵
+    points = points.contiguous().view(bs * num_p, 1, 3)
+    pred_c = pred_c.contiguous().view(bs * num_p)
+    pred = torch.add(torch.bmm(model_points, base), points + pred_t)    # pred[500, 500, 3]
+    if not refine:                                                      # 如果没有训练
+        if idx[0].item() in sym_list:                                   # 如果是对称的物体
+            target = target[0].transpose(1, 0).contiguous().view(3, -1) # [500, 500, 3] -> [3, 250000]
+            pred = pred.permute(2, 0, 1).contiguous().view(3, -1)       # [500, 500, 3] -> [3, 250000]
+            inds = knn(target.unsqueeze(0), pred.unsqueeze(0))          # target每个点云和pred点云进行对比，找到距离最近点云的索引[1, 1, 250000]
+            target = torch.index_select(target, 1, inds.view(-1).detach() - 1)  # 从target点云中，根据计算出来的索引进行挑选,[3, 250000]
+            target = target.view(3, bs * num_p, num_point_mesh).permute(1, 2, 0).contiguous()   # [500, 500, 3]
+            pred = pred.view(3, bs * num_p, num_point_mesh).permute(1, 2, 0).contiguous()   # [500, 500, 3]
+
+    # 求得预测点云和目标点云的平均距离，把置信度和点云距离关联起来
+    dis = torch.mean(torch.norm((pred - target), dim=2), dim=1)
+    loss = torch.mean((dis * pred_c - w * torch.log(pred_c)), dim=0)
+
+
 
 
