@@ -60,6 +60,35 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
     # 求得预测点云和目标点云的平均距离，把置信度和点云距离关联起来
     dis = torch.mean(torch.norm((pred - target), dim=2), dim=1)
     loss = torch.mean((dis * pred_c - w * torch.log(pred_c)), dim=0)
+    pred_c = pred_c.view(bs, num_p)                                     # pred_c[1, 500]
+    how_nax, which_max = torch.max(pred_c, 1)                           # which_max表示索引下标,找到置信度最高的地方
+    dis = dis.view(bs, num_p)                                           # dis[1, 500]
+    t = ori_t[which_max[0]] + points[which_max[0]]                      # 获取最好的偏移矩阵,相对于model_points
+    points = points.view(1, bs * num_p, 3)                              # points[1, 500, 3]
+    ori_base = ori_base[which_max[0]].view(1, 3, 3).contiguous()        # 求得置信度最高的旋转矩阵，相对于摄像头
+    ori_t = t.repeat(bs * num_p, 1).contiguous().view(1, bs * num_p, 3) # ori_t[1, 500, 3]
+
+    new_points = torch.bmm((points - ori_t), ori_base).contiguous()     # 根据预测最好的旋转矩阵,求得当前帧对应的点云
+    new_target = ori_target[0].view(1, num_point_mesh, 3).contiguous()  # new_target[1, 500, 3]
+    ori_t = t.repeat(num_point_mesh, 1).contiguous().view(1, num_point_mesh, 3) # ori_t[1, 500, 3]
+
+    new_target = torch.bmm((new_target - ori_t), ori_base).contiguous() # 根据预测最好的旋转矩阵,求得当前帧对应的点云
+    del knn
+    return loss, dis[0][which_max[0]], new_points.detach(), new_target.detach()
+
+class Loss(_Loss):
+    def __init__(self, num_points_mesh, sym_list):
+        super(Loss, self).__init__(True)
+        self.num_points_mesh = num_points_mesh
+        self.sym_list = sym_list
+
+
+    def forward(self, pred_r, pred_t, pred_c, target, model_points, idx, points, w, refine):
+
+        return loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, w, refine, self.num_points_mesh, self.sym_list)
+
+
+
 
 
 
