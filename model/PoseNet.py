@@ -58,8 +58,6 @@ class PoseNetFeat(nn.Module):
         return torch.cat([pointfeat_1, pointfeat_2, ap_x], 1)                   # [bs, 128 + 256 + 1024,500]
 
 
-
-
 class PoseNet(nn.Module):
     def __init__(self, num_points, num_obj):
         '''

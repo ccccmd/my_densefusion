@@ -38,9 +38,9 @@ def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, 
                       (1.0 - 2.0 * (pred_r[:, :, 1] ** 2 + pred_r[:, :, 2] ** 2)).view(bs, num_p, 1)), dim=2).contiguous().view(bs * num_p, 3, 3)
     ori_base = base                                                     # 记录摄像头旋转矩阵
     base = base.contiguous().transpose(2, 1).contiguous()               # 转换维度[500, 3, 3]
-    # [500, 500, 3]     每个点云需要与所有的predicted点云做距离差
+    # [500, 500, 3]     复制是因为每个点云需要与所有的predicted点云做距离差
     model_points = model_points.view(bs, 1, num_point_mesh, 3).repeat(1, num_p, 1, 1).view(bs * num_p, num_point_mesh, 3)
-    # [500, 500, 3]     每个点云需要与所有的predicted点云做距离差
+    # [500, 500, 3]     复制是因为每个点云需要与所有的predicted点云做距离差
     target = target.view(bs, 1, num_point_mesh, 3).repeat(1, num_p, 1, 1).view(bs * num_p, num_point_mesh, 3)
     ori_target = target                                                 # 记录初始的目标点云
     pred_t = pred_t.contiguous().view(bs * num_p, 1, 3)
