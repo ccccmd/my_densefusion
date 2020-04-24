@@ -86,6 +86,9 @@ def main():
 
     opt.sym_list = dataset.get_sym_list()                                       # 设定对称物体列表
     opt.num_points_mesh = dataset.get_num_points_mesh()                         # 设定点云数目
+    print('----------Dataset loaded!---------\nlength of the training set: {0}\nlength of the testing set: {1}\nnumber '
+          'of sample points on mesh: {2}\nsymmetry object list: {3}'.format(len(dataset), len(test_dataset),
+                                                                            opt.num_points_mesh, opt.sym_list))
 
     criterion = Loss(opt.num_points_mesh, opt.sym_list)                         # loss计算
     criterion_refine = Loss_refine(opt.num_points_mesh, opt.sym_list)           # refine_loss计算
@@ -168,6 +171,92 @@ def main():
                         torch.save(estimator.state_dict(), '{0}.pos_model_current.pth'.format(opt.outf))
 
         print('------------ epoch {0} train finish -----------'.format(epoch))
+        # 进行测试
+        logger = setup_logger('epoch%d test' % epoch, os.path.join(opt.log_dir, 'epoch_%d_test_log.txt' % epoch))
+        # 记录测试时间
+        logger.info('Test time {0}'.format(time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - st_time)) + ',' + 'Testing started'))
+        test_dis = 0.0
+        test_count = 0
+        estimator.eval()                                                        # 验证模型构建
+        refiner.eval()                                                          # refiner模型
+
+        for j, data in enumerate(test_dataloder, 0):
+            points, choose, img, target, model_points, idx = data  # 读取数据
+            '''
+            points: 由深度图计算出来的点云，该点云数据以摄像头为参考坐标
+            choose: 所选择点云的索引[bs, 1, 500]
+            img: 通过box剪切下来的RGB图像
+            target: 根据model_points点云信息，以及旋转偏移矩阵转换过的点云信息[bs, 500, 3]
+            model_points: 目标初始帧对应的点云信息
+            idx: 训练图片的下标
+            '''
+            # 将数据放到device上
+            points, choose, img, target, model_points, idx = points.to(device), choose.to(device), img.to(
+                device), target.to(device), model_points.to(device), idx.to(device)
+
+            # 进行预测获得预测的姿态，和特征向量
+            pred_r, pred_t, pred_c, emb = estimator(img, points, choose, idx)
+            '''
+            pred_r: 旋转矩阵[bs, 500, 4]
+            pred_t: 偏移矩阵[bs, 500, 3]
+            pred_c: 置信度[bs, 500, 1]
+            '''
+
+            # 对结果进行评估
+            _, dis, new_points, new_target = criterion(pred_r, pred_t, pred_c, target, model_points, idx, points, opt.w, opt.refine_start)
+
+            # 如果refine模型开始训练，则同样进行评估
+            if opt.refine_start:
+                for iter in range(0, opt.iteration):
+                    pred_r, pred_t = refiner(new_points, emb, idx)
+                    dis, new_points, new_target = criterion_refine(pred_r, pred_t, new_target, model_points, idx, new_points)
+
+            test_dis += dis.item()                                              # 用于计算平均距离
+            # 保存eval的log
+            logger.info('Test time {0} Test Frame No.{1} dis:{2}'.format(time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - st_time)), test_count, dis))
+            test_count += 1
+
+        test_dis = test_dis / test_count                                        # 计算平均距离
+        logger.info('Test time {0} Epoch {1} Test finish avg_dis:{2}'.format(time.strftime('%Hh %Mm %Ss', time.gmtime(time.time() - st_time)), epoch, test_dis))
+
+        if test_dis <= best_test:                                               # 如果此次测试结果最好，则保留当前测试结果
+            best_test = test_dis
+            if opt.refine_start:                                                # 保存refiner
+                torch.save(refiner.state_dict(), '{0}/pose_refine_model_{1}_{2}.pth'.format(opt.outf, epoch, test_dis))
+            else:
+                torch.save(estimator.state_dict(), '{0}/pose_model_{1}_{2}.pth'.format(opt.outf, epoch, test_dis))
+            print('----------------test model save finished-------------------')
+
+        # 参数变化
+
+        # 判断模型是否达到衰减要求
+        if best_test < opt.decay_margin and not opt.decay_start:
+            opt.decay_start = True
+            opt.lr *= opt.lr_rate                                               # 学习率衰减
+            opt.w *= opt.w_rate                                                 # 权重衰减
+            optimizer = optim.Adam(estimator.parameters(), lr=opt.lr)
+
+        # 模型没有达到loss阈值要求，refine_start = False，则修改相关参数，传递相关数，更新dataset和dataloader
+        if best_test < opt.refine_margin and not opt.refine_start:
+            opt.refine_start = True
+            opt.batch_size = int(opt.batch_size / opt.iteration)
+            optimizer = optim.Adam(refiner.parameters(), lr=opt.lr)
+
+            # 训练
+            dataset = PoseDataset('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
+            dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+            # 测试
+            test_dataset = PoseDataset('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
+            test_dataloder = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
+
+            opt.sym_list = dataset.get_sym_list()
+            opt.num_points_mesh = dataset.get_num_points_mesh()
+            print(
+                '----------Dataset loaded!---------\nlength of the training set: {0}\nlength of the testing set: {1}\nnumber '
+                'of sample points on mesh: {2}\nsymmetry object list: {3}'.format(len(dataset), len(test_dataset),
+                                                                                  opt.num_points_mesh, opt.sym_list))
+            criterion = Loss(opt.num_points_mesh, opt.sym_list)
+            criterion_refine = Loss_refine(opt.num_points_mesh, opt.sym_list)
 
 
 if __name__ == '__main__':
