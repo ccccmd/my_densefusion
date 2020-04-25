@@ -251,8 +251,7 @@ def main():
 
             opt.sym_list = dataset.get_sym_list()
             opt.num_points_mesh = dataset.get_num_points_mesh()
-            print(
-                '----------Dataset loaded!---------\nlength of the training set: {0}\nlength of the testing set: {1}\nnumber '
+            print('----------Dataset loaded!---------\nlength of the training set: {0}\nlength of the testing set: {1}\nnumber '
                 'of sample points on mesh: {2}\nsymmetry object list: {3}'.format(len(dataset), len(test_dataset),
                                                                                   opt.num_points_mesh, opt.sym_list))
             criterion = Loss(opt.num_points_mesh, opt.sym_list)
