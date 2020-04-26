@@ -68,9 +68,9 @@ class PoseNet(nn.Module):
         super(PoseNet, self).__init__()                                         # 继承Module的八大基本参数
         self.num_points = num_points                                            # 点云的数目
         self.cnn = ModifiedResnet()                                             # resenet模型
-        summary(self.cnn, (3, 120, 120))
+        # summary(self.cnn, (3, 120, 120))
         self.feat = PoseNetFeat(num_points)
-        summary(self.feat, [(3, 500), (32, 500)])
+        # summary(self.feat, [(3, 500), (32, 500)])
         self.conv1_r = torch.nn.Conv1d(1408, 640, 1)                            # 依次对应旋转、偏移、置信
         self.conv1_t = torch.nn.Conv1d(1408, 640, 1)
         self.conv1_c = torch.nn.Conv1d(1408, 640, 1)
