@@ -131,7 +131,7 @@ def main():
                 '''
                 # 将数据放到device上
                 points, choose, img, target, model_points, idx = points.to(device), choose.to(device), img.to(device), target.to(device), model_points.to(device), idx.to(device)
-
+                print('---=============------------=============', img.shape, points.shape, choose.shape, idx.shape)
                 # 进行预测获得预测的姿态，和特征向量
                 pred_r, pred_t, pred_c, emb = estimator(img, points, choose, idx)
                 '''

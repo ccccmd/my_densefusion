@@ -9,6 +9,7 @@ from PIL import Image
 import cv2
 import random
 
+
 class PoseDataset(Dataset):
     def __init__(self, mode, num, add_noise, root, noise_trans, refine):
         '''
@@ -111,8 +112,6 @@ class PoseDataset(Dataset):
         self.num_pt_mesh_large = 500                                    # 点云的最大数目
         self.num_pt_mesh_small = 500                                    # 点云的最小数目
         self.symmetry_obj_idx = [7, 8]                                  # 对称物体的标号，实际上对应的是10和11号物体
-
-
 
     def __getitem__(self, index):                                       # dataset的核心关键函数重写
 
@@ -229,7 +228,6 @@ class PoseDataset(Dataset):
             return self.num_pt_mesh_large
         else:
             return self.num_pt_mesh_small
-
 
 
 # 将mask转换为box，把轮廓转化为矩形形状

@@ -2,12 +2,16 @@
 import torch
 import torch.nn as nn
 import math
+
+
 # 3x3卷积
 def conv3x3(in_planes, out_planes, stride=1, dilation=1):
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, dilation=dilation, bias=False)
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=dilation, dilation=dilation, bias=False)
+
 
 class BasicBlock(nn.Module):
     expansion = 1                                                                       # 膨胀系数
+
     def __init__(self, in_planes, planes, stride=1, downsample=None, dilation=1):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(in_planes, planes, stride=stride, dilation=dilation)
@@ -26,6 +30,7 @@ class BasicBlock(nn.Module):
         out += residual
         out = self.relu(out)
         return out
+
 
 class ResNet(nn.Module):
     def __init__(self, block, layers=(3, 4, 23, 3)):
@@ -67,6 +72,7 @@ class ResNet(nn.Module):
         x_3 = self.layer3(x)
         x = self.layer4(x_3)
         return x, x_3
+
 
 def resnet18(pretrained=False):
     model = ResNet(BasicBlock, [2, 2, 2, 2])
