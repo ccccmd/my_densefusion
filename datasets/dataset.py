@@ -179,9 +179,9 @@ class PoseDataset(Dataset):
         pt0 = (ymap_masked - self.cam_cx) * pt2 / self.cam_fx
         pt1 = (xmap_masked - self.cam_cy) * pt2 / self.cam_fy           # 对坐标进行标准化
         cloud = np.concatenate((pt0, pt1, pt2), axis=1)                 # 把y, x, depth3个坐标合并在一起，变成点云数据
-        print('cloud:', cloud)
+        # print('cloud:', cloud)
         cloud = cloud / 1000.0                                          # 根据审读正则化
-        print('cloud:', cloud)
+        # print('cloud:', cloud)
         add_t = np.array([random.uniform(
             -self.noise_trans, self.noise_trans) for i in range(3)])    # 对偏移矩阵添加噪声
         if self.add_noise:                                              # 对点云添加噪声
@@ -201,6 +201,15 @@ class PoseDataset(Dataset):
             target = np.add(target, target_t / 1000.0)
             out_t = target_t / 1000.0
 
+        # print(cloud.shape())
+
+        print('cloud.size->', torch.from_numpy(cloud.astype(np.float32)).size())
+        # print('choose.size->', torch.LongTensor(choose.astype(np.int32)).size())
+        # print('img->', self.norm(torch.from_numpy(img_masked.astype(np.float32))).size())
+        # print('target->', torch.from_numpy(target.astype(np.float32)).size())
+        # print('model_points->', torch.from_numpy(model_points.astype(np.float32)).size())
+        # print('idx->', torch.LongTensor([self.objlist.index(obj)]).size())
+
         '''
         cloud: 由深度图计算出来的点云，该点云数据以本摄像头为参考坐标
         choose: 所选择点云的索引
@@ -216,6 +225,7 @@ class PoseDataset(Dataset):
                torch.from_numpy(target.astype(np.float32)), \
                torch.from_numpy(model_points.astype(np.float32)), \
                torch.LongTensor([self.objlist.index(obj)])
+
 
     def __len__(self):                                                  # 常规重写
         return self.length

@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import warnings
 import random
 import time
 import numpy as np
@@ -18,8 +19,9 @@ from loss.loss_refiner import Loss_refine
 from setup_logger import setup_logger
 from torchsummary import summary
 
-# 用于命令行输入参数
+warnings.filterwarnings('ignore')
 
+# 用于命令行输入参数
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--dataset_root', type=str, default='')                     # 数据路径
@@ -50,7 +52,7 @@ def main():
     opt.num_objects = 13                                                        # 训练数据的物体种类数目
     opt.num_points = 500                                                        # 输入点云的数目
     opt.outf = 'trained_models/linemod'                                         # 训练模型保存的目录
-    opt.log_dir = 'logs/linemod'                                    # log保存的目录
+    opt.log_dir = 'logs/linemod'                                                # log保存的目录
     opt.repeat_epoch = 20                                                       # 重复epoch数目
 
     estimator = PoseNet(num_points=opt.num_points, num_obj=opt.num_objects)     # 网络构建，构建完成，对物体的6D姿态进行预测
@@ -130,8 +132,9 @@ def main():
                 idx: 训练图片的下标
                 '''
                 # 将数据放到device上
+                print('---=============------------=============', points.size(), choose.size(), img.size(),
+                      target.size(), model_points.size(), idx.size())
                 points, choose, img, target, model_points, idx = points.to(device), choose.to(device), img.to(device), target.to(device), model_points.to(device), idx.to(device)
-                print('---=============------------=============', img.shape, points.shape, choose.shape, idx.shape)
                 # 进行预测获得预测的姿态，和特征向量
                 pred_r, pred_t, pred_c, emb = estimator(img, points, choose, idx)
                 '''
