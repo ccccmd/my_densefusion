@@ -28,7 +28,7 @@ class PoseNetFeat(nn.Module):
         '''
         super(PoseNetFeat, self).__init__()
         self.conv1 = torch.nn.Conv1d(3, 64, 1)
-        self.conv2 = torch.nn.Conv2d(64, 128, 1)
+        self.conv2 = torch.nn.Conv1d(64, 128, 1)                                # 1写成了2,debug两天！！！
         self.e_conv1 = torch.nn.Conv1d(32, 64, 1)
         self.e_conv2 = torch.nn.Conv1d(64, 128, 1)
         self.conv5 = torch.nn.Conv1d(256, 512, 1)
@@ -54,7 +54,7 @@ class PoseNetFeat(nn.Module):
         x = F.relu(self.conv6(x))                                               # [bs, 1024, 500]
         ap_x = self.ap1(x)
         ap_x = ap_x.view(-1, 1024, 1).repeat(1, 1, self.num_points)
-        print('ap_x----:',ap_x.shape)
+        print('ap_x----:', ap_x.shape)
         return torch.cat([pointfeat_1, pointfeat_2, ap_x], 1)                   # [bs, 128 + 256 + 1024,500]
 
 
