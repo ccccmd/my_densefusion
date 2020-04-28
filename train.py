@@ -44,9 +44,9 @@ opt = parser.parse_args()
 
 def main():
     print('------------')
-    # opt.manualSeed = random.randint(1, 100)                                     # 设定随机数
-    # random.seed(opt.manualSeed)                                                 # 设定随机种子
-    # torch.manual_seed(opt.manualSeed)                                           # 设定随机种子
+    opt.manualSeed = random.randint(1, 100)                                     # 设定随机数
+    random.seed(opt.manualSeed)                                                 # 设定随机种子
+    torch.manual_seed(opt.manualSeed)                                           # 设定随机种子
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')       # 设定设备
 
     opt.num_objects = 13                                                        # 训练数据的物体种类数目
