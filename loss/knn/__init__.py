@@ -6,7 +6,8 @@ import torch
 from torch.autograd import Variable, Function
 from loss.knn import knn_pytorch as knn_pytorch
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
+
 class KNearestNeighbor(Function):
   """ Compute k nearest neighbors for each query point.
   """
