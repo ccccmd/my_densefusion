@@ -6,6 +6,9 @@ import torch
 from torch.autograd import Variable, Function
 from loss.knn import knn_pytorch as knn_pytorch
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 class KNearestNeighbor(Function):
   """ Compute k nearest neighbors for each query point.
   """
@@ -13,8 +16,8 @@ class KNearestNeighbor(Function):
     self.k = k
 
   def forward(self, ref, query):
-    ref = ref.float().cuda()
-    query = query.float().cuda()
+    ref = ref.float().to(device)
+    query = query.float().to(device)
 
     inds = torch.empty(query.shape[0], self.k, query.shape[2]).long().cuda()
 

@@ -80,11 +80,11 @@ def main():
 
     # 加载训练数据集
     dataset = PoseDataset('train', opt.num_points, True, opt.dataset_root, opt.noise_trans, opt.refine_start)
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=opt.workers)
 
     # 加载验证数据集
     test_dataset = PoseDataset('test', opt.num_points, False, opt.dataset_root, 0.0, opt.refine_start)
-    test_dataloder = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
+    test_dataloder = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=opt.workers)
 
     opt.sym_list = dataset.get_sym_list()                                       # 设定对称物体列表
     opt.num_points_mesh = dataset.get_num_points_mesh()                         # 设定点云数目
@@ -132,8 +132,8 @@ def main():
                 idx: 训练图片的下标
                 '''
                 # 将数据放到device上
-                print('---=============------------=============', points.size(), choose.size(), img.size(),
-                      target.size(), model_points.size(), idx.size())
+                print('---=============------------=============', i, points.size(), choose.size(), img.size(),
+                      target.size(), model_points.size(), idx)
                 points, choose, img, target, model_points, idx = points.to(device), choose.to(device), img.to(device), target.to(device), model_points.to(device), idx.to(device)
                 # 进行预测获得预测的姿态，和特征向量
                 pred_r, pred_t, pred_c, emb = estimator(img, points, choose, idx)
