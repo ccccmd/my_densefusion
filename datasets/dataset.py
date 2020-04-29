@@ -289,8 +289,8 @@ def get_bbox(bbox):
     center = [int((rmin + rmax) / 2), int((cmin + cmax) / 2)]           # 轮廓初始中心点，方便后面计算真实中心点
     rmin = center[0] - int(r_b / 2)                                     # 标准化后的轮廓最上侧
     rmax = center[0] + int(r_b / 2)                                     # 标准化后的轮廓最下侧
-    cmin = center[0] - int(c_b / 2)                                     # 标准化后的轮廓最左侧
-    cmax = center[0] + int(c_b / 2)                                     # 标准化后的轮廓最右侧
+    cmin = center[1] - int(c_b / 2)                                     # 标准化后的轮廓最左侧
+    cmax = center[1] + int(c_b / 2)                                     # 标准化后的轮廓最右侧(气死了，找了三天的bug)
     #特殊值处理
     if rmin < 0:                                                        # 如果rmin超出边界,则整体向下移动-rmin个像素
         rmax = rmax + rmin

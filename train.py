@@ -132,11 +132,6 @@ def main():
                 idx: 训练图片的下标
                 '''
                 # 将数据放到device上
-                print('---=============------------=============', i, points.size(), choose.size(), img.size(),
-                      target.size(), model_points.size(), idx)
-
-                if(points.size() == torch.Size([1, 1])):
-                    continue
 
                 points, choose, img, target, model_points, idx = points.to(device), choose.to(device), img.to(device), target.to(device), model_points.to(device), idx.to(device)
                 # 进行预测获得预测的姿态，和特征向量
