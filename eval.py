@@ -143,7 +143,7 @@ for i, data in enumerate(test_dataloader, 0):                           # 数据
 
     # 与model_info进行对比
     if dis < diameter[idx[0].item()]:
-        success_count[idx[0].item] += 1
+        success_count[idx[0].item()] += 1
         print('No.{0} Pass! Distance: {1}'.format(i, dis))
         fw.write('No.{0} Pass! Distance: {1}\n'.format(i, dis))
     else:
