@@ -241,7 +241,7 @@ class PoseDataset(Dataset):
 
 # 将mask转换为box，把轮廓转化为矩形形状
 def mask_to_bbox(mask):
-    mask = mask.astype(np.unit8)
+    mask = mask.astype(np.uint8)
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     '''
     mask:寻找轮廓的图像，即传入的mask
@@ -250,7 +250,7 @@ def mask_to_bbox(mask):
     返回参数:
     contours: 轮廓本身
     '''
-    x, y, w, h = 0
+    x, y, w, h = 0, 0, 0, 0
     for contour in contours:
         tmp_x, tmp_y, tmp_w, tmp_h = cv2.boundingRect(contour)          # 使用最小矩形将轮廓包住，tmp_x, tmp_y为矩形左上角坐标, w,h为矩形的宽和高
         if tmp_w * tmp_h > w * h:                                       # 返回所有最小矩形中的最大的，能够包住所有轮廓

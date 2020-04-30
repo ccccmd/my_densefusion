@@ -45,7 +45,7 @@ refiner.eval()
 
 # 以eval模式，加载数据
 test_dataset = PoseDataset('eval', num_points, False, opt.dataset_root, 0.0, True)
-test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=10)
+test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 sym_list = test_dataset.get_sym_list()                                  # 获取对称物体的索引
 num_points_mesh = test_dataset.get_num_points_mesh()                    # 500
