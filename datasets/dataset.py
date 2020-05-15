@@ -96,7 +96,6 @@ class PoseDataset(Dataset):
         [[  0   1   2 ... 637 638 639]
         [  0   1   2 ... 637 638 639]
         [  0   1   2 ... 637 638 639]
-        ...
         [  0   1   2 ... 637 638 639]
         [  0   1   2 ... 637 638 639]
         [  0   1   2 ... 637 638 639]]
@@ -180,7 +179,7 @@ class PoseDataset(Dataset):
         pt1 = (xmap_masked - self.cam_cy) * pt2 / self.cam_fy           # 对坐标进行标准化
         cloud = np.concatenate((pt0, pt1, pt2), axis=1)                 # 把y, x, depth3个坐标合并在一起，变成点云数据
         # print('cloud:', cloud)
-        cloud = cloud / 1000.0                                          # 根据审读正则化
+        cloud = cloud / 1000.0                                          # 根据深度正则化
         # print('cloud:', cloud)
         add_t = np.array([random.uniform(
             -self.noise_trans, self.noise_trans) for i in range(3)])    # 对偏移矩阵添加噪声
