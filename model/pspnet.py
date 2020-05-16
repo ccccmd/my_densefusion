@@ -40,7 +40,7 @@ class PSPUpsample(nn.Module):
 
 
 class PSPNet(nn.Module):                                                    # 串联成主体
-    def __init__(self, n_classes=21, sizes=(1, 2, 3, 6), psp_size=2048, deep_features_size=1024, backend='resnet18', pretrained=False):
+    def __init__(self, n_classes=13, sizes=(1, 2, 3, 6), psp_size=2048, deep_features_size=1024, backend='resnet18', pretrained=False):
         super(PSPNet, self).__init__()
         self.feats = getattr(extractors, backend)(pretrained)
         self.psp = PSPModule(psp_size, 1024, sizes)

@@ -53,7 +53,7 @@ def main():
     opt.num_points = 500                                                        # 输入点云的数目
     opt.outf = 'trained_models/linemod'                                         # 训练模型保存的目录
     opt.log_dir = 'logs/linemod'                                                # log保存的目录
-    opt.repeat_epoch = 20                                                       # 重复epoch数目
+    opt.repeat_epoch = 20                                                        # 重复epoch数目
 
     estimator = PoseNet(num_points=opt.num_points, num_obj=opt.num_objects)     # 网络构建，构建完成，对物体的6D姿态进行预测
     print(estimator)
