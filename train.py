@@ -56,6 +56,7 @@ def main():
     opt.repeat_epoch = 20                                                       # 重复epoch数目
 
     estimator = PoseNet(num_points=opt.num_points, num_obj=opt.num_objects)     # 网络构建，构建完成，对物体的6D姿态进行预测
+    print(estimator)
     estimator.to(device)                                                        # 选择设备
     refiner = PoseRefineNet(num_points=opt.num_points, num_obj=opt.num_objects) # 对初步预测的姿态进行提炼
     refiner.to(device)                                                          # 选择设备
