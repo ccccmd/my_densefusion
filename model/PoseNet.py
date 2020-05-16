@@ -14,7 +14,7 @@ class ModifiedResnet(nn.Module):
     def __init__(self):
         super(ModifiedResnet, self).__init__()
         self.model = psp_models['resnet18'.lower()]()
-        self.model = nn.DataParallel(self.model)
+        # self.model = nn.DataParallel(self.model)                                # 数据并行，用于多GPU的调用
 
     def forward(self, x):
         return self.model(x)
