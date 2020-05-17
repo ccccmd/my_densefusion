@@ -100,12 +100,13 @@ class PoseNet(nn.Module):
         '''
 
         out_img = self.cnn(img)                                                 # out_img: [bs, 3, h, w]->[bs, 32, h, w]
+        # print(out_img.size)
         bs, di, _, _ = out_img.size()                                           # 提取bs和维度, bs = bs; di = 32
         emb = out_img.view(bs, di, -1)                                          # resize
         choose = choose.repeat(1, di, 1)                                        # choose: [bs, 1, 500]->[bs, 32, 500]
         emb = torch.gather(emb, 2, choose).contiguous()                         # emb: [bs, 32, -1]->[bs, 32, 500]
         x = x.transpose(2, 1).contiguous()                                      # x: [bs, 500, 3]->[bs, 3, 500]
-        print('!!!!!-------------!!!!!!', x.shape, emb.shape)
+        # print('!!!!!-------------!!!!!!', x.shape, emb.shape)
         ap_x = self.feat(x, emb)                                                # ap_x: [bs, 1408, 500]
 
         rx = F.relu(self.conv1_r(ap_x))

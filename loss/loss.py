@@ -6,6 +6,7 @@ import torch.nn as nn
 import random
 from loss.knn.__init__ import KNearestNeighbor
 
+
 def loss_calculation(pred_r, pred_t, pred_c, target, model_points, idx, points, w, refine, num_point_mesh, sym_list):
     '''
 
