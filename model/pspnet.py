@@ -53,11 +53,7 @@ class PSPNet(nn.Module):                                                    # ä¸
             nn.Conv2d(64, 32, kernel_size=1),
             nn.LogSoftmax()
         )
-        self.classifier = nn.Sequential(
-            nn.Linear(deep_features_size, 256),
-            nn.ReLU(),
-            nn.Linear(256, n_classes)
-        )
+
 
     def forward(self, x):
         f, class_f = self.feats(x)
