@@ -4,6 +4,8 @@ import torch.nn as nn
 from model.pspnet import PSPNet
 import torch.nn.functional as F
 from torchsummary import summary
+import numpy as np
+
 psp_models = {
     'resnet18': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=512, deep_features_size=256, backend='resnet18')
 }
@@ -106,6 +108,8 @@ class PoseNet(nn.Module):
         choose = choose.repeat(1, di, 1)                                        # choose: [bs, 1, 500]->[bs, 32, 500]
         emb = torch.gather(emb, 2, choose).contiguous()                         # emb: [bs, 32, -1]->[bs, 32, 500]
         x = x.transpose(2, 1).contiguous()                                      # x: [bs, 500, 3]->[bs, 3, 500]
+        print('几何向量', x, '几何向量尺寸', x.size())
+        print('颜色向量', emb, '颜色向量尺寸', emb.size())
         # print('!!!!!-------------!!!!!!', x.shape, emb.shape)
         ap_x = self.feat(x, emb)                                                # ap_x: [bs, 1408, 500]
 
@@ -131,6 +135,10 @@ class PoseNet(nn.Module):
         out_rx = out_rx.contiguous().transpose(2, 1).contiguous()               # out_rx: [bs, 500, 4]
         out_tx = out_tx.contiguous().transpose(2, 1).contiguous()               # out_tx: [bs, 500, 3]
         out_cx = out_cx.contiguous().transpose(2, 1).contiguous()               # out_cx: [bs, 500, 1]
+        print('旋转矩阵', out_rx, '旋转矩阵尺寸', out_rx.size())
+        print('平移矩阵', out_tx, '平移矩阵尺寸', out_tx.size())
+        np.set_printoptions(threshold=10)
+        print('置信度', out_cx.detach().numpy(), '置信度尺寸', out_cx.size())
         return out_rx, out_tx, out_cx, emb.detach()
 
 

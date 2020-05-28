@@ -71,6 +71,8 @@ class PoseRefineNet(nn.Module):
 
         rx = self.conv3_r(rx).view(bs, self.num_obj, 4)
         tx = self.conv3_t(tx).view(bs, self.num_obj, 3)
+        print('旋转矩阵', rx.shape)
+        print('平移矩阵', tx.shape)
 
         b = 0
         out_rx = torch.index_select(rx[b], 0, obj[b])
