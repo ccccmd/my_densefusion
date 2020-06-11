@@ -203,12 +203,12 @@ class PoseDataset(Dataset):
 
         # print(cloud.shape())
 
-        # print('cloud.size->', torch.from_numpy(cloud.astype(np.float32)).size())
-        # print('choose.size->', torch.LongTensor(choose.astype(np.int32)).size())
-        # print('img->', self.norm(torch.from_numpy(img_masked.astype(np.float32))).size())
-        # print('target->', torch.from_numpy(target.astype(np.float32)).size())
-        # print('model_points->', torch.from_numpy(model_points.astype(np.float32)).size())
-        # print('idx->', torch.LongTensor([self.objlist.index(obj)]).size())
+        print('cloud.size->', torch.from_numpy(cloud.astype(np.float32)).size())
+        print('choose.size->', torch.LongTensor(choose.astype(np.int32)).size())
+        print('img->', self.norm(torch.from_numpy(img_masked.astype(np.float32))).size())
+        print('target->', torch.from_numpy(target.astype(np.float32)).size())
+        print('model_points->', torch.from_numpy(model_points.astype(np.float32)).size())
+        print('idx->', torch.LongTensor([self.objlist.index(obj)]).size())
 
         '''
         cloud: 由深度图计算出来的点云，该点云数据以本摄像头为参考坐标

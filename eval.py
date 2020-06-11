@@ -14,6 +14,9 @@ from loss.loss import Loss
 from loss.loss_refiner import Loss_refine
 from transformations import quaternion_matrix, quaternion_from_matrix
 
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--dataset_root', type=str, default='')             # 验证数据根目录
@@ -129,6 +132,7 @@ for i, data in enumerate(test_dataloader, 0):                           # 数据
     my_r = quaternion_matrix(my_r)[:3, :3]                              # 取出最终预测的旋转矩阵
     pred = np.dot(model_points, my_r.T) + my_t                          # 获得经过姿态变化后的points
     target = target[0].to('cpu').detach().numpy()                       # 获得目标点云数据
+
 
     # 针对对称物体
     if idx[0].item in sym_list:
